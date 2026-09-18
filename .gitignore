@@ -1,0 +1,11 @@
+# Environments & secrets
+.env
+*.log
+
+# Odoo custom data / temp
+*.pyc
+__pycache__/
+.vscode/
+
+# Backup files (chi luu tren VPS, khong push len Git)
+backup/

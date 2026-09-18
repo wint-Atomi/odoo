@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_employee_form_inherit_wint_hr" model="ir.ui.view">
+        <field name="name">hr.employee.form.inherit.wint.hr</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <!-- Thêm nút bấm thủ công trên Header -->
+            <xpath expr="//header" position="inside">
+                <button name="action_provision_email_and_user" 
+                        string="⚡ Cấp Email &amp; User Odoo" 
+                        type="object" 
+                        class="oe_highlight"
+                        help="Tự động sinh email theo tên + ngày sinh, tạo User Odoo và kích hoạt Cloudflare Email Routing"/>
+            </xpath>
+
+            <!-- Hiển thị Rule ID trong tab HR Settings để kiểm tra -->
+            <xpath expr="//field[@name='user_id']" position="after">
+                <field name="cloudflare_rule_id" groups="base.group_no_one"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

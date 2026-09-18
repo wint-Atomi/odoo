@@ -1,0 +1,27 @@
+services:
+  web:
+    image: odoo:17.0
+    container_name: odoo-web
+    restart: unless-stopped
+    ports:
+      - "8069:8069"
+    environment:
+      - HOST=postgres-16
+      - PORT=5432
+      - USER=odoo
+      - PASSWORD=odoo
+    volumes:
+      - odoo-web-data:/var/lib/odoo
+      - ./config/favicon.ico:/usr/lib/python3/dist-packages/odoo/addons/web/static/img/favicon.ico:ro
+      - ./addons:/mnt/extra-addons
+    networks:
+      - gplx-network
+
+volumes:
+  odoo-web-data:
+    name: odoo-web-data
+
+networks:
+  gplx-network:
+    name: gplx-network
+    external: true

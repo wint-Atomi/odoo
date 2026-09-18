@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_inherit_wint_hr" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.wint.hr</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//app[@name='general_settings']" position="inside">
+                <block title="Tự động hóa Nhân sự (Onboarding &amp; Email)" name="wint_hr_onboarding_block">
+                    <setting string="Tự động tạo tài khoản Odoo" help="Khi tạo nhân viên, tự động ghép Tên + Ngày sinh thành username và tạo tài khoản Odoo để nhân viên đăng nhập">
+                        <field name="auto_create_user"/>
+                    </setting>
+
+                    <setting string="Tên miền Email Công ty" help="Đuôi email, ví dụ: wint.io.vn">
+                        <field name="company_email_domain"/>
+                    </setting>
+
+                    <setting string="Đồng bộ Cloudflare Email Routing" help="Tự động gọi API Cloudflare để chuyển tiếp email công ty về Gmail cá nhân của nhân viên">
+                        <field name="enable_cloudflare_sync"/>
+                        <div class="content-group mt16" invisible="not enable_cloudflare_sync">
+                            <div class="row">
+                                <label for="cloudflare_zone_id" class="col-lg-3 o_light_label"/>
+                                <field name="cloudflare_zone_id"/>
+                            </div>
+                            <div class="row mt8">
+                                <label for="cloudflare_api_token" class="col-lg-3 o_light_label"/>
+                                <field name="cloudflare_api_token" password="True"/>
+                            </div>
+                        </div>
+                    </setting>
+                </block>
+
+                <block title="Cập nhật hệ thống (GitHub Auto-Update)" name="wint_system_update_block">
+                    <setting string="Trạng thái &amp; Bản cập nhật" help="Kiểm tra và cập nhật mã nguồn mới nhất từ GitHub">
+                        <field name="git_has_update" invisible="1"/>
+                        <field name="git_behind_count" invisible="1"/>
+
+                        <div class="content-group">
+                            <div class="mb-3">
+                                <span class="badge text-bg-success py-2 px-3 fs-6" invisible="git_has_update or not git_last_checked">
+                                    <i class="fa fa-check-circle me-1"/> Hệ thống đang ở bản mới nhất
+                                </span>
+                                <span class="badge text-bg-warning py-2 px-3 fs-6" invisible="not git_has_update">
+                                    <i class="fa fa-exclamation-triangle me-1"/> Đang có bản cập nhật mới trên GitHub!
+                                </span>
+                            </div>
+
+                            <div class="row mb-1">
+                                <span class="col-lg-4 text-muted">Bản hiện tại trên VPS:</span>
+                                <div class="col-lg-8 fw-bold">
+                                    <field name="git_current_version" class="oe_inline"/>
+                                </div>
+                            </div>
+
+                            <div class="row mb-1" invisible="not git_has_update">
+                                <span class="col-lg-4 text-muted">Bản mới trên GitHub:</span>
+                                <div class="col-lg-8 text-primary fw-bold">
+                                    <field name="git_latest_version" class="oe_inline"/>
+                                </div>
+                            </div>
+
+                            <div class="row mb-1" invisible="not git_last_checked">
+                                <span class="col-lg-4 text-muted">Kiểm tra lần cuối lúc:</span>
+                                <div class="col-lg-8 text-muted small">
+                                    <field name="git_last_checked" class="oe_inline"/>
+                                </div>
+                            </div>
+
+                            <div class="mt-2 p-2 bg-light border rounded font-monospace small" invisible="not git_changelog">
+                                <div class="fw-bold mb-1">Các commit mới:</div>
+                                <field name="git_changelog"/>
+                            </div>
+
+                            <div class="mt16 d-flex gap-2">
+                                <button name="action_check_system_update" 
+                                        string="🔍 Kiểm tra bản cập nhật" 
+                                        type="object" 
+                                        class="btn-secondary"/>
+
+                                <button name="action_update_system_from_github" 
+                                        string="🚀 Cập nhật ngay từ GitHub" 
+                                        type="object" 
+                                        class="btn-primary" 
+                                        confirm="Hệ thống sẽ kéo mã nguồn mới nhất từ GitHub và khởi động lại Odoo. Quá trình mất khoảng 10-15 giây. Bạn có chắc chắn muốn cập nhật?"/>
+                            </div>
+                            <div class="text-muted mt8 small">
+                                * Bấm <b>Kiểm tra bản cập nhật</b> để xem có commit mới trên GitHub không. Nếu có, bấm <b>Cập nhật ngay từ GitHub</b> để hệ thống tự động kéo code và khởi động lại.
+                            </div>
+                        </div>
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+</odoo>
