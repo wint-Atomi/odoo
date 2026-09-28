@@ -15,7 +15,7 @@ fi
 
 BOT_TOKEN="${TELEGRAM_BOT_TOKEN:-}"
 CHAT_ID="${TELEGRAM_CHAT_ID:-}"
-DOMAIN="odoo.wint.io.vn"
+DOMAIN="${DOMAIN:-odoo.wint.io.vn}"
 HOSTNAME=$(hostname)
 
 # ------ Ham gui Telegram ------
@@ -35,9 +35,22 @@ send_telegram() {
 ERRORS=""
 
 # ------ 1. Kiem tra Odoo web ------
-HTTP_CODE=$(curl -sk -o /dev/null -w "%{http_code}" --max-time 10 "https://$DOMAIN/web/login" 2>/dev/null || echo "000")
+# Kiem tra cong khai qua domain voi co che tu dong thu lai (retry 2 lan, max 15s)
+HTTP_CODE=$(curl -sk -o /dev/null -w "%{http_code}" --connect-timeout 5 --max-time 15 --retry 2 --retry-delay 2 --retry-all-errors "https://$DOMAIN/web/login" 2>/dev/null)
+HTTP_CODE="${HTTP_CODE: -3}"
+HTTP_CODE="${HTTP_CODE:-000}"
+
 if [ "$HTTP_CODE" != "200" ]; then
-    ERRORS="${ERRORS}\n- Odoo web tra ve HTTP $HTTP_CODE (can 200)"
+    # Neu mang ngoai bi loi/timeout, kiem tra ngay noi bo localhost de xac minh Odoo co thuc su chet khong
+    LOCAL_HTTP=$(curl -sk -o /dev/null -w "%{http_code}" --connect-timeout 3 --max-time 5 -H "Host: $DOMAIN" "https://127.0.0.1/web/login" 2>/dev/null)
+    LOCAL_HTTP="${LOCAL_HTTP: -3}"
+    LOCAL_HTTP="${LOCAL_HTTP:-000}"
+
+    if [ "$LOCAL_HTTP" == "200" ]; then
+        echo "[WARN] Mang cong khai/Cloudflare cham (HTTP $HTTP_CODE), nhung Odoo noi bo van 200 OK."
+    else
+        ERRORS="${ERRORS}\n- Odoo web tra ve HTTP $HTTP_CODE (noi bo: $LOCAL_HTTP, can 200)"
+    fi
 fi
 
 # ------ 2. Kiem tra container dang chay ------
